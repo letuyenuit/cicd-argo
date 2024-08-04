@@ -7,7 +7,7 @@ pipeline{
   stages{
     stage("Checkout code"){
       steps{
-        git branch: 'master', url: 'https://github.com/letuyenuit212/cicd-argo.git'
+        git branch: 'master', url: 'https://github.com/letuyenuit/cicd-argo.git'
       }
     }
     stage("Test dotnet version 7"){
