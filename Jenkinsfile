@@ -25,7 +25,7 @@ pipeline{
       steps{
           sh """
               cd netcore
-              dotnet-ef database update
+              ~/.dotnet/tools/dotnet-ef database update
           """
       }
     }
