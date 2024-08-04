@@ -17,8 +17,6 @@ pipeline{
       steps{
           sh """
               cd netcore
-              dotnet clean
-              dotnet restore
               dotnet test
           """
       }
@@ -72,21 +70,21 @@ pipeline{
       }
     }
 
-    stage("Start sqlserver"){
-      steps{
-        sh """
-           docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=test" -p 1433:1433 --name sql_server_container -d mcr.microsoft.com/mssql/server
-        """
-      }
+    // stage("Start sqlserver"){
+    //   steps{
+    //     sh """
+    //        docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=test" -p 1433:1433 --name sql_server_container -d mcr.microsoft.com/mssql/server
+    //     """
+    //   }
 
-    }
+    // }
 
-    stage('Remote Kubernetes') {
-      steps {
-          withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8s', namespace: '', serverUrl: '']]) {
-            sh "helm upgrade --install --force messchart messchart --set netcore_image=${netcore_image} --set reactjs_image=${reactjs_image} --set nodejs_image=${nodejs_image}"
-        }
-      }
-    }
+    // stage('Remote Kubernetes') {
+    //   steps {
+    //       withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8s', namespace: '', serverUrl: '']]) {
+    //         sh "helm upgrade --install --force messchart messchart --set netcore_image=${netcore_image} --set reactjs_image=${reactjs_image} --set nodejs_image=${nodejs_image}"
+    //     }
+    //   }
+    // }
   }
 }
