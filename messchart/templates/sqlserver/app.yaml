@@ -1,0 +1,47 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sqlserver
+  labels:
+    app: sqlserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sqlserver
+  template:
+    metadata:
+      labels:
+        app: sqlserver
+    spec:
+      containers:
+        - name: sqlserver-container
+          image: letuyenuit212/sqlserver:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 1433
+          env:
+            - name: ACCEPT_EULA
+              value: "Y"
+            - name: SA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: sqlserver-secrets
+                  key: password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sqlserver
+  labels:
+    app: sqlserver
+spec:
+  type: ClusterIP
+  ports:
+    - port: 1433
+      targetPort: 1433
+      protocol: TCP
+  selector:
+    matchLabels:
+      app: sqlserver

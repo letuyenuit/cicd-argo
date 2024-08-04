@@ -1,0 +1,40 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: netcore
+  labels:
+    app: netcore
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: netcore
+  template:
+    metadata:
+      labels:
+        app: netcore
+    spec:
+      containers:
+        - name: netcore-container
+          image: { { .Values.netcore_image } }
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: netcore
+  labels:
+    app: netcore
+spec:
+  type: ClusterIP
+  selector:
+    matchLabels:
+      app: netcore
+  ports:
+    - port: 5000
+      targetPort: 5000
+      protocol: TCP
