@@ -15,6 +15,8 @@ pipeline{
           sh """
               cd netcore
               docker build -t $netcore_image_repo .
+              docker run --rm -v .:/app -w /app $netcore_image_repo dotnet restore
+              docker run --rm -v .:/app -w /app $netcore_image_repo dotnet clean
               docker run --rm -v .:/app -w /app $netcore_image_repo dotnet test
           """
       }
