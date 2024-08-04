@@ -1,8 +1,10 @@
 pipeline{
   agent any
   environment{
-      netcore_image_repo = "letuyenuit212/netcore"
-      dockerhub_credentials = credentials('dockerhub-letuyen')
+      netcore_image = "letuyenuit212/netcore"
+      reactjs_image = "letuyenuit212/reactjs"
+      nodejs_image = "letuyenuit212/nodejs"
+      DOCKERHUB_CREDENTIALS_PSW = credentials('dockerhub-letuyen')
   }
   stages{
     stage("Checkout code"){
@@ -10,36 +12,81 @@ pipeline{
         git branch: 'master', url: 'https://github.com/letuyenuit/cicd-argo.git'
       }
     }
-    stage("Test dotnet version 7"){
+    
+    stage("Test"){
       steps{
           sh """
               cd netcore
-              docker build -t $netcore_image_repo .
-              docker run --rm -v .:/app -w /app $netcore_image_repo dotnet restore
-              docker run --rm -v .:/app -w /app $netcore_image_repo dotnet clean
-              docker run --rm -v .:/app -w /app $netcore_image_repo dotnet test
+              dotnet clean
+              dotnet restore
+              dotnet test
           """
       }
     }
-    stage("Migration database dotnet version 7"){
+    stage("Migration database"){
       steps{
           sh """
               cd netcore
-              docker run --rm -v .:/app -w /app $netcore_image_repo dotnet tool install --global dotnet-ef
-              docker run --rm -v .:/app -w /app $netcore_image_repo dotnet-ef database update
+              dotnet-ef database update
           """
       }
     }
-  }
-  post{
-    always{
-        echo "========always========"
+
+    stage("Build docker image"){
+      parallel{
+        stage("Build reactjs image"){
+          steps{
+            sh """
+              cd reactjs
+              docker build -t ${reactjs_image} .
+            """
+          }
+        }
+        stage("Build nodejs image"){
+          steps{
+            sh """
+              cd nodejs
+              docker build -t ${nodejs_image} .
+            """
+          }
+        }
+        stage("Build netcore image"){
+          steps{
+            sh """
+              cd netcore
+              docker build -t ${netcore_image} .
+            """
+          }
+        }
+      }
     }
-    success{
-        echo "========pipeline executed successfully ========"
+
+    stage("Push docker image"){
+      steps{
+        sh """
+          echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u letuyenuit212 --password-stdin
+          docker push ${netcore_image}
+          docker push ${reactjs_image}
+          docker push ${nodejs_image}
+        """
+      }
     }
-    failure{
-        echo "========pipeline execution failed========"
+
+    stage("Start sqlserver"){
+      steps{
+        sh """
+           docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=test" -p 1433:1433 --name sql_server_container -d mcr.microsoft.com/mssql/server
+        """
+      }
+
+    }
+
+    stage('Remote Kubernetes') {
+      steps {
+          withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8s', namespace: '', serverUrl: '']]) {
+            sh "helm upgrade --install --force messchart messchart --set netcore_image=${netcore_image} --set reactjs_image=${reactjs_image} --set nodejs_image=${nodejs_image}"
+        }
+      }
     }
   }
 }
