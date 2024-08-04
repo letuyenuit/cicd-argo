@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: reactjs-container
-          image: { { .Values.reactjs_image } }
+          image: letuyenuit212/reactjs:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 80
@@ -31,11 +31,10 @@ metadata:
     app: reactjs
 spec:
   type: NodePort
-  selector:
-  matchLabels:
-    app: reactjs
   ports:
     - port: 80
       targetPort: 80
       nodePort: 30007
       protocol: TCP
+  selector:
+    app: reactjs

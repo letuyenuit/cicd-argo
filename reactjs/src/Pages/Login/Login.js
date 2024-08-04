@@ -17,6 +17,7 @@ const Login = () => {
         email: email,
         password: password,
       });
+      console.log(res);
       if (res.status === 200) {
         const token = res.data.token;
         const user = res.data.user;

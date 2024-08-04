@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: netcore-container
-          image: { { .Values.netcore_image } }
+          image: letuyenuit212/netcore:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 5000
@@ -31,10 +31,9 @@ metadata:
     app: netcore
 spec:
   type: ClusterIP
-  selector:
-    matchLabels:
-      app: netcore
   ports:
     - port: 5000
       targetPort: 5000
       protocol: TCP
+  selector:
+    app: netcore

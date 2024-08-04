@@ -9,7 +9,7 @@ const createAxiosInstance = () => {
 
   return axios.create({
     baseURL: "/api",
-    // baseURL: `${process.env.REACT_APP_BACKEND_URL}`,
+    // baseURL: `http://localhost:5273`,
     headers,
   });
 };
