@@ -44,7 +44,7 @@ pipeline{
       steps{
           sh """
               cd netcore
-              docker run --rm -v .:/app -w /app dotnet6-app dotnet-ef database update
+              docker run --rm -v .:/app -w /app dotnet8-app dotnet-ef database update
           """
       }
     }
