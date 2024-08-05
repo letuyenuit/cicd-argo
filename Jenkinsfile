@@ -21,6 +21,19 @@ pipeline{
           """
       }
     }
+    stage("Start sqlserver"){
+      steps{
+        sh """
+          container_id=$(docker ps -aq -f name=sql_server_container)
+          if [ -n "$container_id" ]; then
+              docker rm $container_id
+              docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Password#1234" -p 1433:1433 --name sql_server_container -d mcr.microsoft.com/mssql/server
+          else
+              docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Password#1234" -p 1433:1433 --name sql_server_container -d mcr.microsoft.com/mssql/server
+          fi
+        """
+      }
+    }
     stage("Migration database"){
       steps{
           sh """
@@ -70,19 +83,7 @@ pipeline{
       }
     }
 
-    stage("Start sqlserver"){
-      steps{
-        sh """
-          container_id=$(docker ps -aq -f name=sql_server_container)
-          if [ -n "$container_id" ]; then
-              docker rm $container_id
-              docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Password#1234" -p 1433:1433 --name sql_server_container -d mcr.microsoft.com/mssql/server
-          else
-              docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Password#1234" -p 1433:1433 --name sql_server_container -d mcr.microsoft.com/mssql/server
-          fi
-        """
-      }
-    }
+    
 
     stage("Prepare kubernetes"){
       steps{
