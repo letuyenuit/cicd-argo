@@ -95,29 +95,29 @@ pipeline{
     //       sh "ssh vagrant@192.168.56.70 'kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml'"
     //   }
     // }
-    stage("ArgoCD") {
-      steps{
-        withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8s', namespace: '', serverUrl: '']]) {
-            sh '''
-              kubectl get nodes
-              NAMESPACE="argocd"
-              if kubectl get namespace "$NAMESPACE" > /dev/null 2>&1; then
-                echo "Namespace '$NAMESPACE' already exists. Proceeding..."
-              else
-                echo "Namespace '$NAMESPACE' does not exist. Creating..."
-                kubectl create namespace "$NAMESPACE"
-              fi
-              kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-            '''
-        }
-      }
-    }
+    // stage("ArgoCD") {
+    //   steps{
+    //     withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8s', namespace: '', serverUrl: '']]) {
+    //         sh '''
+    //           kubectl get nodes
+    //           NAMESPACE="argocd"
+    //           if kubectl get namespace "$NAMESPACE" > /dev/null 2>&1; then
+    //             echo "Namespace '$NAMESPACE' already exists. Proceeding..."
+    //           else
+    //             echo "Namespace '$NAMESPACE' does not exist. Creating..."
+    //             kubectl create namespace "$NAMESPACE"
+    //           fi
+    //           kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+    //         '''
+    //     }
+    //   }
+    // }
 
-    stage("Wait 1 minutes"){
-      steps{
-        sleep 60
-      }
-    }
+    // stage("Wait 1 minutes"){
+    //   steps{
+    //     sleep 60
+    //   }
+    // }
 
     stage("Deploy"){
       steps{

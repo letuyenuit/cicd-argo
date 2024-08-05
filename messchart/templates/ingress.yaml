@@ -8,13 +8,6 @@ spec:
   rules:
     - http:
         paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: reactjs
-                port:
-                  number: 80
           - path: /argocd
             pathType: Prefix
             backend:
