@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: reactjs-container
-          image: letuyenuit212/reactjs:latest
+          image: { { .Values.reactjs_image } }
           imagePullPolicy: Always
           ports:
             - containerPort: 80

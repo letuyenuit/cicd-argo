@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: netcore-container
-          image: letuyenuit212/netcore:latest
+          image: { { .Values.netcore_image } }
           imagePullPolicy: Always
           ports:
             - containerPort: 5000

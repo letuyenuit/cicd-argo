@@ -111,10 +111,12 @@ pipeline{
       }
     }
 
-    // stage("Deploy"){
-    //   steps{
-    //     sh "ssh vagrant@192.168.56.70 'helm upgrade --install --force messchart messchart --set netcore_image=${netcore_image} --set reactjs_image=${reactjs_image} --set nodejs_image=${nodejs_image}'"
-    //   }
-    // }
+    stage("Deploy"){
+      steps{
+        withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8s', namespace: '', serverUrl: '']]) {
+            sh "helm upgrade --install --force messchart messchart --set netcore_image=${netcore_image} --set reactjs_image=${reactjs_image} --set nodejs_image=${nodejs_image}"
+        }
+      }
+    }
   }
 }
