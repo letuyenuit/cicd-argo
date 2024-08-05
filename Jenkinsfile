@@ -38,7 +38,7 @@ pipeline{
       steps{
           sh """
               cd netcore
-              ~/.dotnet/tools/dotnet-ef database update
+              sudo ~/.dotnet/tools/dotnet-ef database update
           """
       }
     }
@@ -82,7 +82,7 @@ pipeline{
         """
       }
     }
-    
+
     stage('Install argoCD') {
       steps {
           sh "ssh vagrant@192.168.56.70 'kubectl create namespace argocd'"
