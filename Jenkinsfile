@@ -17,7 +17,8 @@ pipeline{
       steps{
           sh """
               cd netcore
-              dotnet test
+              docker build -t dotnet8-app -f Dockerfile.dotnet8 .
+              docker run --rm -v .:/app -w /app dotnet8-app dotnet test
           """
       }
     }
@@ -43,7 +44,7 @@ pipeline{
       steps{
           sh """
               cd netcore
-              sudo ~/.dotnet/tools/dotnet-ef database update
+              docker run --rm -v .:/app -w /app dotnet6-app dotnet-ef database update
           """
       }
     }
