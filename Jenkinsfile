@@ -23,7 +23,7 @@ pipeline{
     }
     stage("Start sqlserver"){
       steps{
-        sh """
+        sh '''
           container_id=$(docker ps -aq -f name=sql_server_container)
           if [ -n "$container_id" ]; then
               docker rm $container_id
@@ -31,7 +31,7 @@ pipeline{
           else
               docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Password#1234" -p 1433:1433 --name sql_server_container -d mcr.microsoft.com/mssql/server
           fi
-        """
+        '''
       }
     }
     stage("Migration database"){
@@ -111,10 +111,10 @@ pipeline{
       }
     }
 
-    stage("Deploy"){
-      steps{
-        sh "ssh vagrant@192.168.56.70 'helm upgrade --install --force messchart messchart --set netcore_image=${netcore_image} --set reactjs_image=${reactjs_image} --set nodejs_image=${nodejs_image}'"
-      }
-    }
+    // stage("Deploy"){
+    //   steps{
+    //     sh "ssh vagrant@192.168.56.70 'helm upgrade --install --force messchart messchart --set netcore_image=${netcore_image} --set reactjs_image=${reactjs_image} --set nodejs_image=${nodejs_image}'"
+    //   }
+    // }
   }
 }
