@@ -70,21 +70,50 @@ pipeline{
       }
     }
 
-    // stage("Start sqlserver"){
-    //   steps{
-    //     sh """
-    //        docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=test" -p 1433:1433 --name sql_server_container -d mcr.microsoft.com/mssql/server
-    //     """
-    //   }
+    stage("Start sqlserver"){
+      steps{
+        sh """
+          container_id=$(docker ps -aq -f name=sql_server_container)
+          if [ -n "$container_id" ]; then
+              docker rm $container_id
+              docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Password#1234" -p 1433:1433 --name sql_server_container -d mcr.microsoft.com/mssql/server
+          else
+              docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Password#1234" -p 1433:1433 --name sql_server_container -d mcr.microsoft.com/mssql/server
+          fi
+        """
+      }
+    }
 
-    // }
+    stage("Prepare kubernetes"){
+      steps{
+        sh """
+          if [ ! -x "$(command -v kubeadm)" ]; then
+            ansible-playbook -i /home/vagrant/ansible-cluster/hosts /home/vagrant/ansible-cluster/kube.yaml
+            ansible-playbook -i /home/vagrant/ansible-cluster/hosts /home/vagrant/ansible-cluster/master.yaml
+            ansible-playbook -i /home/vagrant/ansible-cluster/hosts /home/vagrant/ansible-cluster/join.yaml
+          else
+            ansible-playbook -i /home/vagrant/ansible-cluster/hosts /home/vagrant/ansible-cluster/reset.yaml
+            ansible-playbook -i /home/vagrant/ansible-cluster/hosts /home/vagrant/ansible-cluster/master.yaml
+            ansible-playbook -i /home/vagrant/ansible-cluster/hosts /home/vagrant/ansible-cluster/join.yaml
+          fi
+        """
+      }
+      steps{
+        sleep(120)
+      }
+    }
 
-    // stage('Remote Kubernetes') {
-    //   steps {
-    //       withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8s', namespace: '', serverUrl: '']]) {
-    //         sh "helm upgrade --install --force messchart messchart --set netcore_image=${netcore_image} --set reactjs_image=${reactjs_image} --set nodejs_image=${nodejs_image}"
-    //     }
-    //   }
-    // }
+    stage('Install argoCD') {
+      steps {
+          sh "ssh vagrant@192.168.56.70 'kubectl create namespace argocd'"
+          sh "ssh vagrant@192.168.56.70 'kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml'"
+      }
+    }
+
+    stage("Deploy"){
+      steps{
+        sh "ssh vagrant@192.168.56.70 'helm upgrade --install --force messchart messchart --set netcore_image=${netcore_image} --set reactjs_image=${reactjs_image} --set nodejs_image=${nodejs_image}'"
+      }
+    }
   }
 }
