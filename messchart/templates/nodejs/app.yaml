@@ -5,6 +5,7 @@ metadata:
   name: nodejs
   labels:
     app: nodejs
+  namespace: web
 spec:
   replicas: 1
   selector:
@@ -29,6 +30,7 @@ metadata:
   name: nodejs
   labels:
     app: nodejs
+  namespace: web
 spec:
   type: ClusterIP
   ports:
