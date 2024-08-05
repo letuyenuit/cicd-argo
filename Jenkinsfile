@@ -122,7 +122,7 @@ pipeline{
     stage("Deploy"){
       steps{
         withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8s', namespace: '', serverUrl: '']]) {
-            sh "helm upgrade --install --force mess messchart"
+            sh "helm upgrade --install --force mess messchart --namespace web"
         }
       }
     }
