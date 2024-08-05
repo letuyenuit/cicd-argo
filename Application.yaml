@@ -6,12 +6,12 @@ metadata:
 spec:
   destination:
     namespace: auto-sync-app
-    server: "https://192.168.56.70:6443"
+    server: "https://kubernetes.default.svc"
   project: default
   source:
-    path: guestbook-with-sub-directories
-    repoURL: "https://github.com/mabusaa/argocd-example-apps.git"
-    targetRevision: master
+    path: messchart
+    repoURL: "https://github.com/letuyenuit/cicd-argo.git"
+    targetRevision: HEAD
     directory:
       recurse: true
   syncPolicy:

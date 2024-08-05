@@ -126,5 +126,13 @@ pipeline{
     //     }
     //   }
     // }
+
+    stage("Apply argo application"){
+      steps{
+          withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8s', namespace: '', serverUrl: '']]) {
+            sh "kubectl apply -f Application.yaml"
+        }
+      }
+    }
   }
 }
