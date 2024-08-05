@@ -24,11 +24,16 @@ pipeline{
     stage("Start sqlserver"){
       steps{
         sh '''
-          container_id=$(docker ps -aq -f name=sql_server_container)
-          if [ -n "$container_id" ]; then
-              docker rm $container_id
-              docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Password#1234" -p 1433:1433 --name sql_server_container -d mcr.microsoft.com/mssql/server
+
+          if docker inspect sql_server_container > /dev/null 2>&1; then
+              if $(docker inspect -f '{{.State.Status}}' sql_server_container | grep -q "up"); then
+                  echo "The container $container_name is running."
+              else
+                  echo "The container $container_name is not running."
+                  docker start sql_server_container
+              fi
           else
+              echo "The container $container_name does not exist."
               docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Password#1234" -p 1433:1433 --name sql_server_container -d mcr.microsoft.com/mssql/server
           fi
         '''
