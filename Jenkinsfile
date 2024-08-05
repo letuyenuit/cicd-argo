@@ -82,28 +82,7 @@ pipeline{
         """
       }
     }
-
     
-
-    stage("Prepare kubernetes"){
-      steps{
-        sh """
-          if [ ! -x "$(command -v kubeadm)" ]; then
-            ansible-playbook -i /home/vagrant/ansible-cluster/hosts /home/vagrant/ansible-cluster/kube.yaml
-            ansible-playbook -i /home/vagrant/ansible-cluster/hosts /home/vagrant/ansible-cluster/master.yaml
-            ansible-playbook -i /home/vagrant/ansible-cluster/hosts /home/vagrant/ansible-cluster/join.yaml
-          else
-            ansible-playbook -i /home/vagrant/ansible-cluster/hosts /home/vagrant/ansible-cluster/reset.yaml
-            ansible-playbook -i /home/vagrant/ansible-cluster/hosts /home/vagrant/ansible-cluster/master.yaml
-            ansible-playbook -i /home/vagrant/ansible-cluster/hosts /home/vagrant/ansible-cluster/join.yaml
-          fi
-        """
-      }
-      steps{
-        sleep(120)
-      }
-    }
-
     stage('Install argoCD') {
       steps {
           sh "ssh vagrant@192.168.56.70 'kubectl create namespace argocd'"
